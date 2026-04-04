@@ -102,13 +102,11 @@ with tab1:
             st.write("Scan this QR Code with your smartphone or tablet to access the Sephora AI Hub. No installation or file import is required.")
         
         with col_qr_img:
-            # REPLACE THIS URL WITH YOUR ACTUAL STREAMLIT URL
-            app_url = "https://sephora-crm-ai-hub.streamlit.app/" 
-            
-            # Generating the QR Code via a free API
-            qr_api_url = f"https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={app_url}"
-            st.image(qr_api_url, width=150)
-
+            try:
+                # Lit l'image locale que tu vas mettre sur GitHub
+                st.image("qr_code.png", width=150)
+            except FileNotFoundError:
+                st.info("📌 Upload your 'qr_code.png' to GitHub to display it here.")
 # ==========================================
     # TAB 2 : AFFINITY ENGINE (The Return of the Graph)
     # ==========================================

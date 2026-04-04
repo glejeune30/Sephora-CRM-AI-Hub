@@ -8,11 +8,10 @@ from sklearn.preprocessing import StandardScaler
 st.set_page_config(page_title="Sephora AI Hub", layout="wide")
 
 # --- 2. IMPORTATION AUTOMATIQUE DES DONNÉES ---
-# @st.cache_data permet de garder le fichier en mémoire pour que l'app soit super rapide
 @st.cache_data 
 def load_data():
-    # Remplace le nom du fichier par le nom EXACT de ton fichier CSV sur GitHub
-    df = pd.read_csv("BDD#7_Database_Albert_School_Sephora.csv") 
+    # Pandas est intelligent : il détecte le .zip et le décompresse à la volée !
+    df = pd.read_csv("dataset.zip", compression="zip") 
     
     # Nettoyage automatique
     if 'Axe_Desc' in df.columns:
@@ -23,12 +22,12 @@ def load_data():
         
     return df
 
-with st.spinner("Chargement de la base de données Sephora..."):
+with st.spinner("Loading Sephora database..."):
     try:
         df = load_data()
     except FileNotFoundError:
-        st.error("Erreur : Le fichier CSV est introuvable. Vérifiez qu'il est bien sur GitHub.")
-        st.stop() # Arrête l'application si le fichier n'est pas là
+        st.error("Erreur : Le fichier dataset.zip est introuvable sur GitHub.")
+        st.stop()
 
 # Le Header simple
 st.markdown("<h2 style='margin-top:0;'>💄 Sephora AI Hub</h2>", unsafe_allow_html=True)

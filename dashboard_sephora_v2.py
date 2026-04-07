@@ -39,14 +39,13 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
         "🎯 Affinity Engine", 
         "🧬 Segmentation Lab", 
         "📊 Brand Scorecard",
-        "🚀 Acquisition",
+        "🚀 Acquisition & Omnichannel", # <-- NOM MODIFIÉ ICI
         "👤 Personas",
         "👨‍👩‍👧‍👦 Generational Analysis", 
         "🔮 LTV Prediction",
         "💸 R.O.I Simulator",
         "🔎 Data Audit"
     ])
-    
     # ==========================================
     # TAB 1 : EXECUTIVE COCKPIT (HOME PAGE)
     # ==========================================
@@ -336,7 +335,10 @@ with tab4:
     # ==========================================
     # TAB 5 : ACQUISITION STRATEGY (SALES & SEASONALITY)
     # ==========================================
-with tab5:
+# ==========================================
+    # TAB 5 : ACQUISITION STRATEGY & OMNICHANNEL
+    # ==========================================
+    with tab5:
         st.markdown("<div class='sephora-card'>", unsafe_allow_html=True)
         st.markdown("**Analysis of Sales Impact on Acquisition**")
         st.write("This module identifies recruitment peaks and analyzes whether promotional periods (Sales, Black Friday) are the main drivers for new customers.")
@@ -363,16 +365,14 @@ with tab5:
             # Thickening the line so it remains visible over the blocks
             fig_time.update_traces(line=dict(width=4), marker=dict(size=10))
             
-            # --- ADDING THE 5 KEY PERIODS (More opaque and colored) ---
+            # --- ADDING THE 5 KEY PERIODS ---
             fig_time.add_vrect(x0="01 - January", x1="02 - February", fillcolor="#CCCCCC", opacity=0.4, line_width=0, annotation_text="❄️ Winter Sales", annotation_position="top left")
             fig_time.add_vrect(x0="05 - May", x1="05 - May", fillcolor="#FFB6C1", opacity=0.4, line_width=0, annotation_text="🌸 Mother's Day", annotation_position="top left")
             fig_time.add_vrect(x0="06 - June", x1="07 - July", fillcolor="#CCCCCC", opacity=0.4, line_width=0, annotation_text="☀️ Summer Sales", annotation_position="top left")
             fig_time.add_vrect(x0="11 - November", x1="11 - November", fillcolor="#000000", opacity=0.25, line_width=0, annotation_text="🖤 Black Friday", annotation_position="top left")
             fig_time.add_vrect(x0="12 - December", x1="12 - December", fillcolor="#E50000", opacity=0.25, line_width=0, annotation_text="🎄 Christmas", annotation_position="top left")
             
-            # Forcing all annotations to black, slightly larger
             fig_time.update_annotations(font=dict(size=13, color="#000000", family="Arial"))
-            
             fig_time.update_layout(plot_bgcolor='white', yaxis_title="Number of new customers", xaxis_title="")
             st.plotly_chart(fig_time, use_container_width=True)
 
@@ -380,7 +380,7 @@ with tab5:
             col_marques, col_cat = st.columns(2)
             
             with col_marques:
-                st.markdown("**2. Top 5 Gateway Brands (Recruitment)**")
+                st.markdown("**2. Top 5 Gateway Brands**")
                 gateway = df_new.groupby('brand')['anonymized_card_code'].nunique().sort_values(ascending=False).head(5).reset_index()
                 fig_gate = px.bar(gateway, x='anonymized_card_code', y='brand', orientation='h', color_discrete_sequence=['#000000'])
                 fig_gate.update_layout(plot_bgcolor='white', xaxis_title="Recruited customers", yaxis_title="")
@@ -392,8 +392,37 @@ with tab5:
                 fig_pie = px.pie(entry, names='Axe_Desc', values='count', hole=0.5, color_discrete_sequence=['#E50000', '#000000', '#666666'])
                 st.plotly_chart(fig_pie, use_container_width=True)
 
-            st.info("💡 **Actionable Insight:** If peaks coincide with sales (January/June), Sephora must activate an aggressive loyalty program at M+1 to prevent these 'price hunter' customers from becoming inactive.")
-
+        # --- NEW SECTION: OMNICHANNEL ANALYSIS ---
+        st.markdown("---")
+        st.markdown("**4. Omnichannel Analysis: Store vs. Online (E-commerce)**")
+        
+        if 'store_city' in df.columns:
+            # We flag transactions as "Online" if the store city is WEB or E-COMMERCE
+            df['Channel'] = df['store_city'].apply(lambda x: 'Online (Web)' if str(x).strip().upper() in ['WEB', 'ONLINE', 'E-COMMERCE'] else 'Physical Store')
+            
+            col_chan1, col_chan2 = st.columns(2)
+            
+            with col_chan1:
+                # Revenue split by channel
+                channel_dist = df.groupby('Channel')['salesVatEUR'].sum().reset_index()
+                fig_chan1 = px.pie(channel_dist, names='Channel', values='salesVatEUR', hole=0.5,
+                                   title="Revenue Split: Web vs. Store",
+                                   color='Channel', color_discrete_map={'Online (Web)': '#E50000', 'Physical Store': '#000000'})
+                st.plotly_chart(fig_chan1, use_container_width=True)
+                
+            with col_chan2:
+                # Online penetration by RFM segment
+                chan_rfm = df.groupby(['RFM_Name', 'Channel'])['anonymized_Ticket_ID'].nunique().reset_index()
+                chan_rfm['Total'] = chan_rfm.groupby('RFM_Name')['anonymized_Ticket_ID'].transform('sum')
+                chan_rfm['% Share'] = (chan_rfm['anonymized_Ticket_ID'] / chan_rfm['Total']) * 100
+                
+                fig_chan2 = px.bar(chan_rfm, x='RFM_Name', y='% Share', color='Channel',
+                                   title="Online Penetration by Customer Segment",
+                                   color_discrete_map={'Online (Web)': '#E50000', 'Physical Store': '#000000'})
+                fig_chan2.update_layout(plot_bgcolor='white', yaxis_title="% of Transactions", xaxis_title="")
+                st.plotly_chart(fig_chan2, use_container_width=True)
+                
+            st.info("💡 **Omnichannel Insight:** Analyzing digital penetration allows the CRM team to understand if VIPs are omnichannel shoppers (who usually spend 2x more) and if 'Bargain Hunters' strictly buy online during major sales.")
 # ==========================================
     # TAB 6 : PERSONA GENERATOR (TABLE VERSION)
     # ==========================================

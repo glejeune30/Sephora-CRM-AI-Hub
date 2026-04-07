@@ -28,7 +28,6 @@ with st.spinner("Loading Sephora database..."):
     except FileNotFoundError:
         st.error("Erreur : Le fichier dataset.zip est introuvable sur GitHub.")
         st.stop()
-
 # Le Header simple
 st.markdown("<h2 style='margin-top:0;'>💄 Sephora AI Hub</h2>", unsafe_allow_html=True)
 st.markdown("---")
@@ -46,6 +45,7 @@ tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8, tab9, tab10 = st.tabs([
         "💸 R.O.I Simulator",
         "🔎 Data Audit"
     ])
+    
     # ==========================================
     # TAB 1 : EXECUTIVE COCKPIT (HOME PAGE)
     # ==========================================
@@ -106,6 +106,7 @@ with tab1:
                 st.image("qr_code.png", width=150)
             except FileNotFoundError:
                 st.info("📌 Upload your 'qr_code.png' to GitHub to display it here.")
+
 # ==========================================
     # TAB 2 : AFFINITY ENGINE (The Return of the Graph)
     # ==========================================
@@ -333,12 +334,9 @@ with tab4:
             st.plotly_chart(fig3, use_container_width=True)
 
     # ==========================================
-    # TAB 5 : ACQUISITION STRATEGY (SALES & SEASONALITY)
-    # ==========================================
-# ==========================================
     # TAB 5 : ACQUISITION STRATEGY & OMNICHANNEL
     # ==========================================
-    with tab5:
+with tab5:
         st.markdown("<div class='sephora-card'>", unsafe_allow_html=True)
         st.markdown("**Analysis of Sales Impact on Acquisition**")
         st.write("This module identifies recruitment peaks and analyzes whether promotional periods (Sales, Black Friday) are the main drivers for new customers.")
